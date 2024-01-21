@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe App</title>
+</head>
+<body>
+    <h1>Random Recipe</h1>
+    <div id="recipe-container">
+        <p>Loading...</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/recipes')
+                .then(response => response.json())
+                .then(data => {
+                    const recipeContainer = document.getElementById('recipe-container');
+                    if (data.error) {
+                        recipeContainer.innerHTML = <p>Error: ${data.error}</p>;
+                    } else {
+                        const recipe = data.recipes[0];
+                        recipeContainer.innerHTML = `
+                            <h2>${recipe.strMeal}</h2>
+                            <img src="${recipe.strMealThumb}" alt="${recipe.strMeal}" style="max-width: 100%;">
+                            <p><strong>Category:</strong> ${recipe.strCategory}</p>
+                            <p><strong>Area:</strong> ${recipe.strArea}</p>
+                            <p><strong>Ingredients:</strong> ${Object.values(recipe).slice(13, 33).filter(Boolean).join(', ')}</p>
+                            <p><strong>Instructions:</strong> ${recipe.strInstructions}</p>
+                            <p><strong>Source:</strong> <a href="${recipe.strSource}" target="_blank">${recipe.strSource}</a></p>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    const recipeContainer = document.getElementById('recipe-container');
+                    recipeContainer.innerHTML = <p>Error: ${error.message}</p>;
+                });
+        });
+    </script>
+</body>
+</html>
